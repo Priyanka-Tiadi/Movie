@@ -4,6 +4,9 @@ import moment from "moment/moment";
 import { useRouter, useRoute } from "vue-router";
 import { toast } from "vue3-toastify";
 import StarRating from "../components/StarRating.vue";
+import {useAppStore} from '../stores/app.js'
+
+const app = useAppStore()
 
 const router = useRouter();
 const route = useRoute();
@@ -106,18 +109,16 @@ async function deleteRating(rating) {
       Authorization: `Bearer ${token}`,
     },
   });
-
-  if (res.ok) {
-    toast.success("Rating deleted!");
-    ratings.value = ratings.value.filter((e) => e.id !== rating.id);
-  } else {
-    const json = await res.json();
-    toast.error(json.message || "Failed to delete rating");
+  const json = await res.json();
+   if (!res.ok) {
+    toast.error(json.message || "Failed to delete cover");
+    return;
   }
+  toast.success("Rating deleted!");
+  ratings.value = ratings.value.filter((e) => e.id !== rating.id);
+  count.value--;
 }
-
 watch(selectedRating, fetchRating);
-
 onMounted(() => {
   let token = localStorage.getItem("token");
   if (!token) {
@@ -131,7 +132,7 @@ onMounted(() => {
 <template>
   <!-- Rating Form Section -->
   <div class="rating-form-container">
-    <form @submit.prevent="setRating">
+    <form @submit.prevent="setRating" v-if="ratings.every(e => e.user !== app.user.id)">
       <div>
         <label>Your Rating:</label>
         <span>
@@ -167,11 +168,11 @@ onMounted(() => {
   <!-- Ratings List -->
   <div class="ratings-list">
     <div class="rating-card" v-for="rating in ratings" :key="rating.id">
-      <p>User: {{ rating.user }}</p>
+      <p><b>User:</b> {{ rating.user }}</p>
       <p><strong>Rating:</strong> <StarRating :rating="rating.rating" /></p>
       <p><strong>Review:</strong> {{ rating.review }}</p>
       <p><strong>Created At:</strong> {{ moment(rating.createdAt).fromNow() }}</p>
-      <button @click="deleteRating(rating)">❌</button>
+      <button @click="deleteRating(rating)"v-if="rating.user === app.user.id">❌</button>
     </div>
   </div>
 

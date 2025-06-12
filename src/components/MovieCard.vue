@@ -1,12 +1,16 @@
 <script setup>
 import StarRating from './StarRating.vue'
+import { useRouter, useRoute } from "vue-router";
 
+
+const router = useRouter();
 const props = defineProps(['movie'])
+const id = props.movie.id;
 </script>
 
 <template>
   <div class="movie">
-    <router-link :to="`/movies/${props.movie.id}`">
+    <router-link :to="`/movies/${id}`">
     <img
       class="cover"
       :src="props.movie.cover || 'https://thumbs.dreamstime.com/b/error-not-found-page-concept-d-isometric-view-vector-web-app-design-illustration-website-problem-256061684.jpg'"
@@ -15,10 +19,10 @@ const props = defineProps(['movie'])
   </router-link>
     <p class="movie-id">{{ props.movie.id }}</p>
     <p class="movie-name">{{ props.movie.name }}</p>
-
+    <StarRating :rating="props.movie.rating" />
     <!-- ✅ Use StarRating component -->
     
-    <StarRating :rating="props.movie.rating"/>
+    
     
   </div>
 </template>

@@ -1,34 +1,33 @@
 <script setup>
 import moment from "moment/moment";
-import { ref, onMounted, nextTick } from "vue";
+import { nextTick, ref } from "vue";
+import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
+import {useAppStore} from '../stores/app.js'
 
 const router = useRouter();
+const app = useAppStore()
 
-// Load saved data from localStorage when component mounts
 onMounted(() => {
-  const token = localStorage.getItem("token");
+  let token = localStorage.getItem("token");
   if (!token) {
     router.push("/login");
+    return;
   }
-  fetchUser();
 });
-//User data
-const user = ref();
+
 const isEditingEmail = ref(false);
 
 const emailInput = ref(null);
-const isEditingPhoto = ref(false);
-
-
-
-//edit mail
 function editEmail() {
   isEditingEmail.value = true;
   nextTick(() => emailInput.value?.focus());
 }
+//edit photo
+const isEditingPhoto = ref(false);
+
+//editi password
 const showPasswordFields = ref(false);
 const passwords = ref({
   old: "",
@@ -41,94 +40,74 @@ function cancelEditMode() {
   showPasswordFields.value = false;
 }
 
-async function fetchUser() {
-  try {
-    const backend = import.meta.env.VITE_BACKEND;
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${backend}/users`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const json = await res.json();
-    if (!res.ok) {
-      toast.error(json.message);
-      if(res.status=== 401){
-        localStorage.removeItem("token")
-        router.push("/login")
-      }
-      return;
-    }
-    user.value = json.user;
-  } catch (error) {
-    alert("Error:" + error.message);
-  }
-}
-
-//save user data
 async function saveUserData() {
   try {
     const backend = import.meta.env.VITE_BACKEND;
     const token = localStorage.getItem("token");
-    // if (showPasswordFields.value) {
-    //   if (
-    //     !passwords.value.old ||
-    //     !passwords.value.new ||
-    //     !passwords.value.confirm
-    //   ) {
-    //     toast.error("Enter all Password Field");
-    //     return;
-    //   }
-    //   if (!passwords.value.new || !passwords.value.confirm) {
-    //     toast.error("Password are not matching");
-    //     return;
-    //   }
-    // }
-    const updateData = {};
-    if (isEditingEmail.value) {
-      updateData.email = user.value.email;
-    }
+    console.log(showPasswordFields.value);
+
     if (showPasswordFields.value) {
-      updateData.password = passwords.value.new;
-      updateData.oldPassword = passwords.value.old;
+      if (
+        !passwords.value.old ||
+        !passwords.value.new ||
+        !passwords.value.confirm
+      ) {
+        toast.error("please enter all pasword field");
+        return;
+      }
+      if (passwords.value.new !== passwords.value.confirm) {
+        toast.error("passwords are not matching");
+        return;
+      }
     }
+    console.log(showPasswordFields.value);
+
+    const updatedData = {};
+
+    if (isEditingEmail.value) {
+      updatedData.email = app.user.email;
+    }
+
+    if (showPasswordFields.value) {
+      updatedData.password = passwords.value.new;
+      updatedData.oldPassword = passwords.value.old;
+    }
+
     const response = await fetch(`${backend}/users`, {
       method: "PATCH",
       headers: {
-        "content-Type": "application/json",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(updateData),
+      body: JSON.stringify(updatedData),
     });
 
     const json = await response.json();
     if (!response.ok) {
       toast.error(json.message || "Failed to save data");
-      if(res.status=== 401){
-        localStorage.removeItem("token")
-        router.push("/login")
-      }
       return;
     }
-    if(json.token){
-      localStorage.setItem("token",json.token)
-    }
-    toast.success("User data updated!");
+
+    toast.success("User data saved!");
     passwords.value.new = "";
     passwords.value.confirm = "";
     showPasswordFields.value = false;
     isEditingEmail.value = false;
+    if(json.token) {
+      localStorage.setItem('token', json.token)
+    }
   } catch (error) {
-    toast.error("Error:" + error.message);
+    console.error(error);
+    toast.error("Error: " + error.message);
   }
 }
-//upload photo
+// photo section
 async function uploadPhoto(event) {
   try {
     const backend = import.meta.env.VITE_BACKEND;
     const token = localStorage.getItem("token");
-
     const formData = new FormData();
-    
+
     formData.append("photo", event.target.files[0]);
     const response = await fetch(`${backend}/users/photo`, {
       method: "PUT",
@@ -137,99 +116,68 @@ async function uploadPhoto(event) {
       },
       body: formData,
     });
-
     const json = await response.json();
     if (!response.ok) {
-      toast.error(json.message || "Failed to upload photo");
-      if(res.status=== 401){
-        localStorage.removeItem("token")
-        router.push("/login")
-      }
+      toast.error(json.message || "failed to upload photo");
       return;
     }
-    toast.success("Photo Uploaded Successfully !");
+    toast.success("photo uploaded  successfully");
     isEditingPhoto.value = false;
-    user.value.photo = json.photo;
+    app.user.photo = json.photo;
   } catch (error) {
-    toast.error("Error:" + error.message);
+    toast.error("Error: " + error.message);
   }
 }
-
-//delete photo
 async function deletePhoto() {
   try {
     const backend = import.meta.env.VITE_BACKEND;
     const token = localStorage.getItem("token");
-    
-    
-    
-    const response = await fetch(`${backend}/users/photo`, {
+    const res = await fetch(`${backend}/users/photo`, {
       method: "DELETE",
-      headers: {
-        
-        Authorization: `Bearer ${token}`,
-      },
-      
+      headers: { Authorization: `Bearer ${token}` },
     });
-
-    const json = await response.json();
-    if (!response.ok) {
-      toast.error(json.message || "Failed to save data");
-      if(res.status=== 401){
-        localStorage.removeItem("token")
-        router.push("/login")
-      }
+    const json = await res.json();
+    if (!res.ok) {
+      toast.error(json.message);
       return;
     }
-    user.value.photo=null;
-    toast.success("photo deleted successfully")
+    app.user.photo = null;
+    toast.success("Photo deleted successfully.");
   } catch (error) {
-    toast.error("Error:" + error.message);
+    alert("Error: " + error.message);
   }
 }
-
 </script>
 
 <template>
-  <div v-if="user" class="container">
+  <div v-if="app.user" class="container">
     <h2>User Profile</h2>
-    <div class="preview-row">
-      <div class="input-icon-wrapper">
-        <img
-          :src="
-            user.photo ??
-            'https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg'
-          "
-          class="profile-pic"
-          alt="Profile Picture"
-        />
-        <span v-if="isEditingPhoto">
-          <input type="file" accept="image/*" @change="(e) => uploadPhoto(e)" />
-          <span class="close" @click="deletePhoto">❌</span>
-        </span>
-        <template v-else>
-          <span class="icon-pencil" @click="isEditingPhoto = true">✏️</span>
-        </template>
-      </div>
+    <div>
+      <img
+        :src="
+          app.user.photo ??
+          'https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg'
+        "
+        class="profile-pic"
+        alt="profile-picture"
+      />
+      <span v-if="isEditingPhoto">
+        <input type="file" accept="image/*" @change="(e) => uploadPhoto(e)" />
+        <span class="close" @click="deletePhoto">❌</span>
+      </span>
+
+      <template v-else>
+        <span class="icon-pencil" @click="isEditingPhoto = true">✏️</span>
+      </template>
     </div>
 
     <div class="info">
       <!-- Name -->
       <label>
-        <strong>Name:</strong>
-        <div class="input-icon-wrapper">
-          <template v-if="isEditingName">
-            <input
-              ref="nameInput"
-              v-model="user.name"
-              type="text"
-              @blur="isEditingName = false"
-            />
-          </template>
-          <template v-else>
-            <span>{{ user.name || "N/A" }}</span>
-          </template>
-        </div>
+        <strong
+          >Name:
+          <span>{{ app.user.name || "N/A" }}</span>
+        </strong>
       </label>
 
       <!-- Email -->
@@ -237,15 +185,10 @@ async function deletePhoto() {
         <strong>Email:</strong>
         <div class="input-icon-wrapper">
           <template v-if="isEditingEmail">
-            <input
-              ref="emailInput"
-              v-model="user.email"
-              type="email"
-             
-            />
+            <input ref="emailInput" v-model="app.user.email" type="email" />
           </template>
           <template v-else>
-            <span>{{ user.email || "N/A" }}</span>
+            <span>{{ app.user.email || "N/A" }}</span>
             <span class="icon-pencil" @click="editEmail">✏️</span>
           </template>
         </div>
@@ -276,11 +219,12 @@ async function deletePhoto() {
           <input type="password" v-model="passwords.confirm" />
         </label>
       </div>
+
       <!-- Gender -->
       <label>
         <strong>Gender:</strong>
         <div class="radio-group">
-          <label v-if="user.gender === 'male'" class="gender-option"
+          <label v-if="app.user.gender === 'male'" class="gender-option"
             >♂ Male</label
           >
           <label v-else class="gender-option">♀ Female </label>
@@ -288,21 +232,21 @@ async function deletePhoto() {
       </label>
 
       <!-- Created At -->
-      <p><strong>Created At:</strong>{{ moment(user.createdAt).fromNow() }}</p>
+      <p><strong>Created At:</strong> {{ moment(app.user.createdAt).fromNow() }}</p>
 
+      <button
+        class="cancle-btn"
+        v-if="isEditingEmail || showPasswordFields"
+        @click="cancelEditMode"
+      >
+        CANCLE
+      </button>
       <button
         class="save-btn"
         v-if="isEditingEmail || showPasswordFields"
         @click="saveUserData"
       >
-        save
-      </button>
-      <button
-        class="cancel-btn"
-        v-if="isEditingEmail || showPasswordFields"
-        @click="cancelEditMode"
-      >
-        cancel
+        Save Changes
       </button>
     </div>
   </div>
@@ -368,24 +312,31 @@ label {
 .icon-pencil {
   cursor: pointer;
   font-size: 1.1rem;
-  color: #007bff;
+  color: #10e6b4;
 }
 
 button.change-btn,
 button.save-btn {
   margin-top: 10px;
   padding: 8px 14px;
-  background-color: #007bff;
+  gap: 20px;
+  background-color: #218838;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s ease;
 }
+button.cancle-btn {
+  margin-top: 10px;
+  padding: 8px 14px;
 
-button.change-btn:hover,
-button.save-btn:hover {
-  background-color: #0056b3;
+  background-color: #218838;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .password-fields input {
@@ -406,23 +357,4 @@ button.save-btn:hover {
   font-weight: 500;
   font-size: 1rem;
 }
-.close{
-  cursor: pointer;
-}
-button.cancel-btn {
-  margin-top: 10px;
-  padding: 8px 14px;
-  background-color: #dc3545; /* Bootstrap danger red */
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  margin-left: 10px; /* spacing from save button */
-}
-
-button.cancel-btn:hover {
-  background-color: #a71d2a;
-}
-
 </style>

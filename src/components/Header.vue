@@ -1,37 +1,53 @@
 <script setup>
 import { RouterLink } from 'vue-router'
 import logo from "../assets/vue.svg"
+import { useAppStore } from '../stores/app.js'
 
-function logout(){
-  localStorage.removeItem('token')
-}
-
+const app = useAppStore()
 </script>
 
 <template>
   <header>
     <RouterLink to="/">
-      <img :src="logo" alt="Logo" height="25" />
+      <img src="../assets/vue.svg" alt="Logo" height="25">
     </RouterLink>
-    <RouterLink to="/Profile">Profile</RouterLink>
-    <RouterLink to="/register">Register</RouterLink>
-    <RouterLink to="/login">Login</RouterLink>
-     <RouterLink to="/login"@click="logout">Logout</RouterLink>
-    
-    
+
+    <template v-if="app.user">
+      <RouterLink to="/profile">
+        Profile
+      </RouterLink>
+
+      <RouterLink to="/login" @click="app.logout">
+        Logout
+      </RouterLink>
+    </template>
+
+    <template v-else>
+      <RouterLink to="/register">
+        Register
+      </RouterLink>
+
+      <RouterLink to="/login">
+        Login
+      </RouterLink>
+    </template>
+
+
   </header>
 </template>
 
 <style scoped>
 header {
   height: 50px;
-  background-color: rgb(255, 208, 192);
+  background-color: rgb(237, 184, 106);
   display: flex;
   align-items: center;
 }
+
 header img {
   margin-left: 30px;
 }
+
 a {
   color: orangered;
   font-weight: bold;
