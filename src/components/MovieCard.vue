@@ -16,11 +16,10 @@ const id = props.movie.id;
       :src="props.movie.cover || 'https://thumbs.dreamstime.com/b/error-not-found-page-concept-d-isometric-view-vector-web-app-design-illustration-website-problem-256061684.jpg'"
       alt="Movie Cover"
     />
-  </router-link>
     <p class="movie-id">{{ props.movie.id }}</p>
     <p class="movie-name">{{ props.movie.name }}</p>
     <StarRating :rating="props.movie.rating" />
-    <!-- ✅ Use StarRating component -->
+  </router-link>
     
     
     
@@ -54,5 +53,8 @@ const id = props.movie.id;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   letter-spacing: 1px;
   text-transform: capitalize;
+}
+a{
+  text-decoration: none;
 }
 </style>

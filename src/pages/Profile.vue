@@ -315,28 +315,35 @@ label {
   color: #10e6b4;
 }
 
-button.change-btn,
 button.save-btn {
   margin-top: 10px;
-  padding: 8px 14px;
-  gap: 20px;
-  background-color: #218838;
+  padding: 10px 20px;
+  background-color: #28a745; /* Green */
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-weight: bold;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.3s ease;
+}
+button.save-btn:hover {
+  background-color: #218838;
 }
 button.cancle-btn {
   margin-top: 10px;
-  padding: 8px 14px;
-
-  background-color: #218838;
+  padding: 10px 20px;
+  background-color: #dc3545; /* Red */
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-weight: bold;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.3s ease;
+  margin-left: 10px;
+}
+
+button.cancle-btn:hover {
+  background-color: #c82333;
 }
 
 .password-fields input {

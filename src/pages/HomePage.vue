@@ -185,6 +185,10 @@ button:hover {
   display: flex;
   align-items: center;
   gap: 10px;
+  background-color: #eef4ff; /* soft light blue */
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #cbd6ee; /* light border */
 }
 .buttons {
   display: flex;
