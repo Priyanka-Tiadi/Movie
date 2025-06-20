@@ -4,7 +4,7 @@ import { nextTick, ref } from "vue";
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
-import {useAppStore} from '../stores/app.js'
+import {useAppStore} from '../Stores/app.js'
 
 const router = useRouter();
 const app = useAppStore()

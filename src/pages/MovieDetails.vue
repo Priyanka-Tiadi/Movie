@@ -5,7 +5,7 @@ import { useRoute, useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
 import StarRating from "../components/StarRating.vue";
 import RatingList from "./RatingList.vue";
-import {useAppStore} from '../stores/app.js'
+import {useAppStore} from '../Stores/app.js'
 
 const app = useAppStore()
 

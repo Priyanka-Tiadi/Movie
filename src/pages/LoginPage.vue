@@ -1,6 +1,6 @@
 <script setup>
 import {onMounted, ref} from 'vue'
-import { useAppStore } from '../stores/app.js'
+import { useAppStore } from '../Stores/app.js'
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 
