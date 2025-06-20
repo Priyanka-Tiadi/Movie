@@ -20,10 +20,7 @@ const id = props.movie.id;
     <p class="movie-name">{{ props.movie.name }}</p>
     <StarRating :rating="props.movie.rating" />
   </router-link>
-    
-    
-    
-  </div>
+    </div>
 </template>
 
 <style scoped>

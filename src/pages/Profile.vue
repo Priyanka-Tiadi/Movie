@@ -361,7 +361,24 @@ button.cancle-btn:hover {
 }
 
 .gender-option {
+   margin-top: 10px;
   font-weight: 500;
   font-size: 1rem;
 }
+button.change-btn {
+  margin-top: 5px;
+  padding: 10px 20px;
+  background-color: #007bff; /* Blue */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button.change-btn:hover {
+  background-color: #0056b3;
+}
+
 </style>

@@ -168,6 +168,7 @@ button:hover {
   gap: 20px;
   justify-content: center;
   margin-top: 30px;
+   font-size: 20px; 
 }
 
 .top-controls {

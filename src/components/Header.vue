@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import logo from "../assets/vue.svg"
+import logo from "../assets/imdb2.png"
 import { useAppStore } from '../stores/app.js'
 
 const app = useAppStore()
@@ -9,7 +9,7 @@ const app = useAppStore()
 <template>
   <header>
     <RouterLink to="/">
-      <img src="../assets/vue.svg" alt="Logo" height="25">
+      <img src="../assets/imdb2.png" alt="Logo" height="50">
     </RouterLink>
 
     <template v-if="app.user">
