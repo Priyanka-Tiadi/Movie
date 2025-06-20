@@ -1,7 +1,7 @@
 <script setup>
 import { RouterLink } from 'vue-router'
 import logo from "../assets/imdb2.png"
-import { useAppStore } from '../stores/app.js'
+import { useAppStore } from '../Stores/app.js'
 
 const app = useAppStore()
 </script>
